@@ -1,18 +1,10 @@
 {
-  "max_trials": 4,
+  "model_name": "retinanet",
+  "max_trials": 2,
   "max_instances_at_once": 1,
-  "model_priority_space": [
-    10,
-    0,
-    0
-  ],
-  "task": "detection",
   "epochs": 2,
   "search_method": "random",
-  "augmentation_search_method": "regular",
-  "data": {
-    "home_path": "../data/tiny_coco",
-    "annotation_type": "coco",
-    "dataset_name": "2017"
-  }
+  "augmentation_search": false,
+  "home_path": "../data/tiny_coco",
+  "annotation_type": "coco"
 }

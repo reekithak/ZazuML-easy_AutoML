@@ -1,7 +1,4 @@
-FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
-
-WORKDIR /root
-ADD . /root/ZazuML
+FROM nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04
 
 RUN mkdir /root/data
 
@@ -22,10 +19,11 @@ RUN apt-get update && apt-get install -y \
     nano \
     vim \
     python3-numpy \
+    openssh-server \
     && rm -rf /var/lib/apt/lists/*
 
 RUN cd /root/data && \
-    git clone https://github.com/dataloop-ai/tiny_coco.git
+    git clone https://github.com/NoamRosenberg/tiny_coco.git
 
 # Install Miniconda
 RUN wget \
@@ -40,7 +38,7 @@ ENV CONDA_AUTO_UPDATE_CONDA=false
 
 # CUDA 10.0-specific steps
 RUN conda install -y -c pytorch \
-    cudatoolkit=10.1 \
+    cudatoolkit=10.2 \
     pytorch=1.6 \
     torchvision=0.7.0 \
  && conda clean -ya
@@ -48,5 +46,20 @@ RUN conda install -y -c pytorch \
 RUN conda install -c conda-forge pycocotools
 # Install HDF5 Python bindings
 
-RUN cd /root/ZazuML && \
-    pip install -r requirements.txt
+RUN cd /root && git clone https://github.com/dataloop-ai/AutoML.git \
+    && mv /root/AutoML /root/ZazuML && cd /root/ZazuML
+
+RUN pip install -r /root/ZazuML/requirements.txt
+
+WORKDIR /root/ZazuML
+
+
+# Add ssh in container 
+# Set SSH(root) Password
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ARG PASSWORD=mikumiku
+RUN echo root:${PASSWORD} | chpasswd
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+EXPOSE 22
+ENTRYPOINT ["/entrypoint.sh"]

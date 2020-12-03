@@ -18,7 +18,7 @@ colorama==0.4.3
 colorful==0.5.4
 #conda==4.8.3
 #conda-package-handling==1.7.0
-cryptography==2.9.2
+cryptography==3.2
 cycler==0.10.0
 Cython==0.29.21
 decorator==4.4.2
@@ -47,6 +47,7 @@ hiredis==1.1.0
 hyperopt==0.2.4
 idna==2.9
 imageio==2.9.0
+imgaug
 Jinja2==2.11.2
 joblib==0.16.0
 jsonschema==3.2.0
@@ -122,6 +123,7 @@ tqdm==4.46.0
 urllib3==1.25.8
 validators==0.17.1
 git+https://github.com/ildoonet/pytorch-gradual-warmup-lr.git@v0.1  # warmup-scheduler==0.1
+git+https://github.com/wbaek/theconf@de32022f8c0651a043dc812d17194cdfd62066e8
 wcwidth==0.2.5
 webvtt-py==0.4.3
 Werkzeug==1.0.1

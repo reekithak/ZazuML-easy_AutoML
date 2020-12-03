@@ -4,21 +4,16 @@ First thing to do is . . .
 
 ### *pull & run the Docker Image*
 ```
-docker run --rm -it --init  --runtime=nvidia  --ipc=host  -e NVIDIA_VISIBLE_DEVICES=0 buffalonoam/zazu-image:0.3 bash
+docker run --rm -it --gpus all  buffalonoam/zazu-image:0.9 bash
 ```
-Be sure to update the nvidia-devices flag!
+About the docker image: Should work over all Cuda 10.* systems, this API is for docker 19.03 +
 
-### *clone the repo*
+### *If you don't use docker, clone the repo and data*
 ```
 git clone https://github.com/dataloop-ai/ZazuML.git
-
-```
-
-### *download tiny coco dataset*
-```
 mkdir data
 cd data
-git clone https://github.com/dataloop-ai/tiny_coco.git
+git clone https://github.com/NoamRosenberg/tiny_coco.git
 cd ../ZazuML
 ```
 
