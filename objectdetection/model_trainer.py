@@ -1,18 +1,20 @@
-
+import os
+import psutil
 import glob
 import shutil
 import time
 import torch.optim as optim
 from tqdm import tqdm
 from . import csv_eval
-from dataloaders import *
+from dataloader import *
+
 from networks import get_model
 from torch.utils.data import DataLoader
 
 from logging_utils import logginger, init_logging
 
 logger = logginger(__name__)
-mem_log = init_logging('GPU_Memory', 'mem_log.log')
+mem_log = init_logging('Memory', 'mem_log.log')
 
 print('CUDA available: {}'.format(torch.cuda.is_available()))
 
@@ -56,10 +58,10 @@ class ModelTrainer:
             transform_train.transforms.insert(0, Augmentation(augment_policy, detection=True))
 
         if self.dataset == 'coco':
-            self.dataset_train = CocoDataset(self.data_path, set_name=train_set_name,
-                                             transform=transform_train)
-            self.dataset_val = CocoDataset(self.data_path, set_name=val_set_name,
-                                           transform=transform_val)
+            self.dataset_train = CustomDataset(self.data_path, data_format="coco",
+                                             function_transforms=transform_train)
+            self.dataset_val = CustomDataset(self.data_path, data_format="coco",
+                                           function_transforms=transform_val)
 
         elif self.dataset == 'csv':
             if csv_train is None:
@@ -139,7 +141,7 @@ class ModelTrainer:
                 self.optimizer.zero_grad()
                 st_loss = time.time()
                 classification_loss, regression_loss = self.model(
-                    [data['img'].to(device=self.device).float(), data['annot'].to(device=self.device)])
+                    [data.image.float().to(device=self.device), data.annot.to(device=self.device)])
                 time_to_compute_loss.append(time.time() - st_loss)
                 classification_loss = classification_loss.mean()
                 regression_loss = regression_loss.mean()
@@ -180,7 +182,11 @@ class ModelTrainer:
 
         if self.tb_writer:
             self.tb_writer.close()
-        mem_log.info(round(torch.cuda.memory_cached(0) / 1024 ** 2, 0))
+        if torch.cuda.is_available():
+            mem_log.info(round(torch.cuda.memory_cached(0) / 1024 ** 2, 0)) # GPU Memory
+        else:
+            process = psutil.Process(os.getpid())
+            mem_log.info(round(process.memory_info().rss / 1024 ** 2, 0))   # Memory
 
     def get_best_checkpoint(self):
         return torch.load(self.save_best_checkpoint_path)
